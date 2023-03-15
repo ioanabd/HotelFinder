@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:hotel_finder/models/question.dart';
 
+import '../services/questions_service.dart';
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -84,7 +86,8 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void startQuiz() {
-
+  void startQuiz() async{
+    final QuestionService questionService = QuestionService();
+    List<Question> questions = await questionService.getQuestions();
   }
 }

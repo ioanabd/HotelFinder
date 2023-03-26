@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:hotel_finder/models/question.dart';
+import 'package:hotel_finder/pages/questions/question_page.dart';
+import 'package:hotel_finder/providers/question_provider.dart';
+import 'package:provider/provider.dart';
 
-import '../services/questions_service.dart';
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -13,6 +14,8 @@ class _HomePageState extends State<HomePage> {
   Color? fundal = Colors.amber;
   @override
   Widget build(BuildContext context) {
+    var questionsProvider = context.watch<QuestionProvider>();
+
     return SafeArea(child:
     Container(
         constraints: const BoxConstraints.expand(),
@@ -38,10 +41,10 @@ class _HomePageState extends State<HomePage> {
                     child: Text(
                       'Welcome!',
                       style: TextStyle(
-                          color: Colors.amber[800],
-                          fontSize: 39,
-                          decoration: TextDecoration.none,
-                          fontWeight: FontWeight.bold,
+                        color: Colors.amber[800],
+                        fontSize: 39,
+                        decoration: TextDecoration.none,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
@@ -61,13 +64,20 @@ class _HomePageState extends State<HomePage> {
                     height: 60,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        primary: Colors.amber[800],
-                        onPrimary: Colors.black,
+                        backgroundColor: Colors.amber[800],
+                        foregroundColor: Colors.black,
                         elevation: 3,
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(34.0)),
                       ),
-                      onPressed: startQuiz,
+                      onPressed: () => {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (_) => ChangeNotifierProvider.value(
+                              value: context.read<QuestionProvider>(),
+                              child: QuestionPage(),
+                            )
+                        ))
+                      },
                       child: Text(
                         'Get started',
                         style: TextStyle(
@@ -84,10 +94,5 @@ class _HomePageState extends State<HomePage> {
         )
     )
     );
-  }
-
-  void startQuiz() async{
-    final QuestionService questionService = QuestionService();
-    List<Question> questions = await questionService.getQuestions();
   }
 }

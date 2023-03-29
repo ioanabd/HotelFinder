@@ -4,6 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:hotel_finder/providers/question_provider.dart';
 import 'package:provider/provider.dart';
 
+import '../../models/question.dart';
+import '../../widgets/custom_appbar.dart';
+import '../hotels/hotel_page.dart';
+
 class QuestionPage extends StatefulWidget {
   const QuestionPage({Key? key}) : super(key: key);
 
@@ -13,6 +17,9 @@ class QuestionPage extends StatefulWidget {
 
 class _QuestionPageState extends State<QuestionPage> {
 
+  List<Question> _questionAnswered = [];
+  Color _color = Colors.amber;
+
   @override
   Widget build(BuildContext context) {
     var questionsProvider = context.watch<QuestionProvider>();
@@ -21,113 +28,128 @@ class _QuestionPageState extends State<QuestionPage> {
         builder: (BuildContext ctx, AsyncSnapshot asyncSnapshot) {
           if (asyncSnapshot.connectionState == ConnectionState.done) {
             if (asyncSnapshot.hasError) {
-              return const Center(child: Text('Could not retreive recipes!'));
+              return const Center(child: Text('Could not retrieve questions!'));
             }
-            return ListView.builder(
-                itemCount: questionsProvider.questions.length,
-                itemBuilder: (BuildContext ctx, int index) {
-                  return SafeArea(
-                    child: Scaffold(
-                      body: Container(
-                        alignment: Alignment.center,
-                        padding: EdgeInsets.all(10),
-                        child: SingleChildScrollView(
-                          child: Column(
-                            children: [
-                              screenHeader('Hotel Finder'),
-                              quizQuestion(questionsProvider.questions[index].questionText),
-                              questionOptions(questionsProvider.questions[index].answers),
-                              // footerButton(),
-                            ],
+            return SafeArea(
+              child: Scaffold(
+                appBar: const CustomAppBar(title: 'Hotel Finder', back: true),
+                backgroundColor: Colors.white,
+                body: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      ListView.builder(
+                            shrinkWrap: true,
+                            physics: const ScrollPhysics(),
+                            itemCount: questionsProvider.questions.length,
+                            itemBuilder: (BuildContext ctx, int index) {
+                              return Container(
+                                alignment: Alignment.center,
+                                child: Column(
+                                  children: [
+                                    quizQuestion(questionsProvider.questions[index]
+                                        .questionText),
+                                    questionOptions(questionsProvider.questions[index]
+                                        ),
+                                  ],
+                                ),
+                              );
+                            }
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(5,8.0,5,8.0),
+                          child: SizedBox(
+                          width: 400,
+                          height: 64,
+                            child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.amber[800],
+                                foregroundColor: Colors.black,
+                                elevation: 3,
+                                shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0)),
+                                ),
+                                  onPressed: () => {
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (_) => ChangeNotifierProvider.value(
+                                  value: context.read<QuestionProvider>(),
+                                    child: HotelPage(answers: _questionAnswered),)),
+                                  ),},
+                              child: const Text(
+                                'Get Hotels',
+                                style: TextStyle(
+                                    fontSize: 27,
+                                    decoration: TextDecoration.none
+                                ),
+                                ),
+                            ),
                           ),
                         ),
-                      ),
-                    ),
-                  );
-                }
+                    ],
+                  ),
+                ),
+                
+                ),
             );
           } else {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
         }
-    );
-  }
-  Widget screenHeader(String title) {
-    return Container(
-      alignment: Alignment.center,
-      child: Text(
-        title,
-        style: Theme
-            .of(context)
-            .textTheme
-            .displaySmall,
-      ),
     );
   }
 
     Widget quizQuestion(String questionText) {
       return Container(
         alignment: Alignment.centerLeft,
-        padding: EdgeInsets.all(20),
-        margin: EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.all(20),
         child: Text(
           questionText,
-          style: Theme.of(context).textTheme.displaySmall,
+            style: const TextStyle(
+              color: Colors.black,
+              fontSize: 30,
+              decoration: TextDecoration.none,
+              fontWeight: FontWeight.bold,
+            )
         ),
       );
     }
 
-  Widget questionOptions(List<String> answers) {
+  Widget questionOptions(Question question) {
     return Container(
       alignment: Alignment.center,
       child: Column(
         children: [
-          for ( int i = 0; i < answers.length; i++ ) Text(i.toString())
+          for ( int i = 0; i < question.answers.length; i++ )
+            answersText(question, i)
         ],
       ),
     );
   }
 
-  Widget answersText(){
-    Color? getColor(Set<MaterialState> states) {
-      const Set<MaterialState> interactiveStates = <MaterialState>{
-        MaterialState.pressed,
-        MaterialState.hovered,
-        MaterialState.focused,
-      };
-      if (states.any(interactiveStates.contains)) {
-        return Colors.amber[800];
-      }
-      return Colors.white;
-    }
-    bool isChecked = false;
-    return Padding(
-        padding: const EdgeInsets.fromLTRB(0, 350, 0, 100),
+  Widget answersText(Question question, int i){
+    List<String> userAnswers = [];
+    return GestureDetector(
+      onTap: (){
+        userAnswers.add(question.answers[i]);
+        _questionAnswered.add(new Question(name: question.name, questionText: question.questionText, answers: userAnswers));
+        setState(() => _color = Colors.deepPurple);
+      },
       child: Card(
-        color: Colors.amber[800],
-        child: SizedBox(
-          width: 370,
-          height: 80,
-          child: Row(
-            children: [
-                Checkbox(
-                checkColor: Colors.white,
-                fillColor: MaterialStateProperty.resolveWith(getColor),
-                    value: isChecked,
-                    onChanged: (bool? value) {
-                      setState(() {
-                        isChecked = value!;
-                      });
-                    }
-              ),
-                Text('alo', style: TextStyle(
-                    fontSize: 27,
-                    decoration: TextDecoration.none
-                )),
-            ],
+          color: Colors.amber[600],
+          child: Container(
+            width: 380,
+            height: 70,
+            decoration: BoxDecoration(
+              color: _color
+            ),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20.0,20,0,0),
+              child: Text(question.answers[i], style: const TextStyle(
+                        fontSize: 25,
+                        decoration: TextDecoration.none
+                    )),
+            ),
+            ),
           ),
-        ),
-      ),
     );
   }
 }

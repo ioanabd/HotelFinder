@@ -19,6 +19,9 @@ class _QuestionPageState extends State<QuestionPage> {
 
   List<Question> _questionAnswered = [];
 
+  List _facilitiesAnswers = [];
+  List _roomFacilitiesAnswers = [];
+
   @override
   Widget build(BuildContext context) {
     var questionsProvider = context.watch<QuestionProvider>();
@@ -37,57 +40,81 @@ class _QuestionPageState extends State<QuestionPage> {
                   child: Column(
                     children: [
                       ListView.builder(
-                            shrinkWrap: true,
-                            physics: const ScrollPhysics(),
-                            itemCount: questionsProvider.questions.length,
-                            itemBuilder: (BuildContext ctx, int index) {
+                          shrinkWrap: true,
+                          physics: const ScrollPhysics(),
+                          itemCount: questionsProvider.questions.length,
+                          itemBuilder: (BuildContext ctx, int index) {
+                            if (questionsProvider.questions[index].name == "facilitati") {
+                              build_list_facilities(questionsProvider.questions[index]);
+                              return Container(
+                                alignment: Alignment.center,
+                                child: Column(
+                                  children: [
+                                    quizQuestion(questionsProvider.questions[index].questionText),
+                                    quizFaciltiesMultipleAnswersQuestion(questionsProvider.questions[index])
+                                  ],
+                                ),
+                              );
+                            } else if (questionsProvider.questions[index].name == "facilitati_camera") {
+                              build_list_room_facilities(questionsProvider.questions[index]);
+                              return Container(
+                                alignment: Alignment.center,
+                                child: Column(
+                                  children: [
+                                    quizQuestion(questionsProvider.questions[index].questionText),
+                                    quizRoomFaciltiesMultipleAnswersQuestion(questionsProvider.questions[index])
+                                  ],
+                                ),
+                              );
+                            } else {
                               return Container(
                                 alignment: Alignment.center,
                                 child: Column(
                                   children: [
                                     quizQuestion(questionsProvider.questions[index]
                                         .questionText),
-                                    questionOptions(questionsProvider.questions[index]
-                                        ),
+                                    answersText(questionsProvider.questions[index]
+                                    ),
                                   ],
                                 ),
                               );
                             }
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(5,8.0,5,8.0),
-                          child: SizedBox(
-                          width: 400,
+                          }
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(5,8.0,6,8.0),
+                        child: SizedBox(
+                          width: 378,
                           height: 64,
-                            child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.amber[800],
-                                foregroundColor: Colors.black,
-                                elevation: 3,
-                                shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10.0)),
-                                ),
-                                  onPressed: () => {
-                                  Navigator.of(context).push(MaterialPageRoute(
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.amber[800],
+                              foregroundColor: Colors.black,
+                              elevation: 3,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0)),
+                            ),
+                            onPressed: () => {
+                              Navigator.of(context).push(MaterialPageRoute(
                                   builder: (_) => ChangeNotifierProvider.value(
-                                  value: context.read<QuestionProvider>(),
+                                    value: context.read<QuestionProvider>(),
                                     child: HotelPage(answers: _questionAnswered),)),
-                                  ),},
-                              child: const Text(
-                                'Get Hotels',
-                                style: TextStyle(
-                                    fontSize: 27,
-                                    decoration: TextDecoration.none
-                                ),
-                                ),
+                              ),},
+                            child: const Text(
+                              'Get Hotels',
+                              style: TextStyle(
+                                  fontSize: 27,
+                                  decoration: TextDecoration.none
+                              ),
                             ),
                           ),
                         ),
+                      ),
                     ],
                   ),
                 ),
-                
-                ),
+
+              ),
             );
           } else {
             return const Center(child: CircularProgressIndicator());
@@ -96,60 +123,142 @@ class _QuestionPageState extends State<QuestionPage> {
     );
   }
 
-    Widget quizQuestion(String questionText) {
-      return Container(
-        alignment: Alignment.centerLeft,
-        padding: const EdgeInsets.all(20),
-        child: Text(
-          questionText,
-            style: const TextStyle(
-              color: Colors.black,
-              fontSize: 30,
-              decoration: TextDecoration.none,
-              fontWeight: FontWeight.bold,
-            )
-        ),
-      );
-    }
-
-  Widget questionOptions(Question question) {
+  Widget quizQuestion(String questionText) {
     return Container(
-      alignment: Alignment.center,
-      child: Column(
-        children: [
-          for ( int i = 0; i < question.answers.length; i++ )
-            answersText(question, i)
-        ],
+      alignment: Alignment.centerLeft,
+      padding: const EdgeInsets.all(20),
+      child: Text(
+          questionText,
+          style: const TextStyle(
+            color: Colors.black,
+            fontSize: 30,
+            decoration: TextDecoration.none,
+            fontWeight: FontWeight.bold,
+          )
       ),
     );
   }
 
-  Widget answersText(Question question, int i){
-    List<String> userAnswers = [];
-    Color? color = Colors.amber;
-    return GestureDetector(
-      onTap: (){
-        userAnswers.add(question.answers[i]);
-        _questionAnswered.add(new Question(name: question.name, questionText: question.questionText, answers: userAnswers));
-        setState(() => color = Colors.amber[800]);
-      },
-      child: Card(
-          color: Colors.amber[600],
-          child: Container(
-            width: 380,
-            height: 70,
-            decoration: BoxDecoration(
-              color: color
+  Widget quizFaciltiesMultipleAnswersQuestion(Question question) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(6.0,0,6,0),
+      child: Column(
+        children: List.generate(
+          question.answers.length,
+              (index) => Card(
+                color: Colors.amber,
+                child: CheckboxListTile(
+            controlAffinity: ListTileControlAffinity.leading,
+            contentPadding: EdgeInsets.zero,
+            dense: true,
+            title: Text(
+                question.answers[index],
+                style: const TextStyle(
+                  fontSize: 25.0,
+                  color: Colors.black,
+                ),
             ),
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20.0,20,0,0),
-              child: Text(question.answers[i], style: const TextStyle(
-                        fontSize: 25,
-                        decoration: TextDecoration.none
-                    )),
-            ),
-            ),
+            value: _facilitiesAnswers[index]["value"],
+            onChanged: (value) {
+                setState(() {
+                  _facilitiesAnswers[index]["value"] = value;
+                });
+            },
           ),
+              ),
+        ),
+      ),
     );
   }
+
+  Widget quizRoomFaciltiesMultipleAnswersQuestion(Question question) {
+    List<String> userAnswers = [];
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(6.0,0,6.0,0),
+      child: Column(
+        children: List.generate(
+          question.answers.length,
+              (index) => Card(
+                color: Colors.amber,
+                child: CheckboxListTile(
+            controlAffinity: ListTileControlAffinity.leading,
+            contentPadding: EdgeInsets.zero,
+            dense: true,
+            title: Text(
+                question.answers[index],
+                style: const TextStyle(fontSize: 25.0,color: Colors.black),
+            ),
+            value: _roomFacilitiesAnswers[index]["value"],
+            checkColor: Colors.black,
+            onChanged: (value) {
+                userAnswers.add(question.answers[index]);
+                _questionAnswered.add(new Question(name: question.name, questionText: question.questionText, answers: userAnswers));
+                setState(() {
+                  _roomFacilitiesAnswers[index]["value"] = value;
+                });
+            },
+          ),
+              ),
+        ),
+      ),
+    );
+  }
+
+  Widget answersText(Question question){
+    List<String> userAnswers = [];
+    String? _character = question.answers[0];
+    return Column(
+      children: List.generate(
+          question.answers.length,
+              (index) => Card(
+              color: Colors.amber,
+                child: ListTile(
+                  title: Text(
+                    question.answers[index],
+                    style: const TextStyle(fontSize: 25.0,color: Colors.black),
+                  ),
+                  leading: Radio<String>(
+                    value: question.answers[0],
+                    groupValue: _character,
+                    onChanged: (String? value) {
+                      setState(() {
+                        _character = value;
+                      });
+                    },
+                  ),
+                ),
+      ),),
+    );
+  }
+
+  void build_list_facilities(Question question) {
+    for (String answer in question.answers) {
+      _facilitiesAnswers.add(
+          {
+            "name": answer,
+            "value": false
+          }
+      );
+    }
+  }
+
+  void build_list_room_facilities(Question question) {
+    for (String answer in question.answers) {
+      _roomFacilitiesAnswers.add(
+          {
+            "name": answer,
+            "value": false
+          }
+      );
+    }
+  }
+
+  // void answers_single(Question question){
+  //   _singleAnswer.add(
+  //       {
+  //         "name": question,
+  //         "value": false
+  //       }
+  //   );
+  // }
 }

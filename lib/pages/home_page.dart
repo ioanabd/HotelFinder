@@ -78,12 +78,7 @@ class _HomePageState extends State<HomePage> {
                             )
                         ))
                       },
-                      child: Text(
-                        'Get started',
-                        style: TextStyle(
-                            fontSize: 27,
-                            decoration: TextDecoration.none
-                        ),
+                      child: const Text('Get started',style: TextStyle(fontSize: 27, decoration: TextDecoration.none),
                       ),
                     ),
                   ),

@@ -18,7 +18,6 @@ class QuestionPage extends StatefulWidget {
 class _QuestionPageState extends State<QuestionPage> {
 
   List<Question> _questionAnswered = [];
-  Color _color = Colors.amber;
 
   @override
   Widget build(BuildContext context) {
@@ -127,11 +126,12 @@ class _QuestionPageState extends State<QuestionPage> {
 
   Widget answersText(Question question, int i){
     List<String> userAnswers = [];
+    Color? color = Colors.amber;
     return GestureDetector(
       onTap: (){
         userAnswers.add(question.answers[i]);
         _questionAnswered.add(new Question(name: question.name, questionText: question.questionText, answers: userAnswers));
-        setState(() => _color = Colors.deepPurple);
+        setState(() => color = Colors.amber[800]);
       },
       child: Card(
           color: Colors.amber[600],
@@ -139,7 +139,7 @@ class _QuestionPageState extends State<QuestionPage> {
             width: 380,
             height: 70,
             decoration: BoxDecoration(
-              color: _color
+              color: color
             ),
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20.0,20,0,0),

@@ -21,6 +21,13 @@ class _QuestionPageState extends State<QuestionPage> {
 
   List _facilitiesAnswers = [];
   List _roomFacilitiesAnswers = [];
+  List _tipProprietateAnswers = [];
+  List _capacitateAnswers = [];
+  List _distantaCentruAnswers = [];
+  List _scorAnswers = [];
+  List _baieAnswers = [];
+  List _micdejunAnswers = [];
+  List _steleAnswers = [];
 
   @override
   Widget build(BuildContext context) {
@@ -67,13 +74,14 @@ class _QuestionPageState extends State<QuestionPage> {
                                 ),
                               );
                             } else {
+                              build_list_baie(questionsProvider.questions[index]);
                               return Container(
                                 alignment: Alignment.center,
                                 child: Column(
                                   children: [
                                     quizQuestion(questionsProvider.questions[index]
                                         .questionText),
-                                    answersText(questionsProvider.questions[index]
+                                    answersText(questionsProvider.questions[index], _baieAnswers
                                     ),
                                   ],
                                 ),
@@ -204,9 +212,9 @@ class _QuestionPageState extends State<QuestionPage> {
     );
   }
 
-  Widget answersText(Question question){
+  Widget answersText(Question question, List answersMap){
     List<String> userAnswers = [];
-    String? _character = question.answers[0];
+    String? character = question.answers[0];
     return Column(
       children: List.generate(
           question.answers.length,
@@ -218,11 +226,11 @@ class _QuestionPageState extends State<QuestionPage> {
                     style: const TextStyle(fontSize: 25.0,color: Colors.black),
                   ),
                   leading: Radio<String>(
-                    value: question.answers[0],
-                    groupValue: _character,
-                    onChanged: (String? value) {
+                    value: answersMap[index]["value"],
+                    groupValue: character,
+                    onChanged: (value) {
                       setState(() {
-                        _character = value;
+                        answersMap[index]["value"] = value;
                       });
                     },
                   ),
@@ -253,12 +261,80 @@ class _QuestionPageState extends State<QuestionPage> {
     }
   }
 
-  // void answers_single(Question question){
-  //   _singleAnswer.add(
-  //       {
-  //         "name": question,
-  //         "value": false
-  //       }
-  //   );
-  // }
+  void build_list_tip_proprietate(Question question) {
+    for (String answer in question.answers) {
+      _tipProprietateAnswers.add(
+          {
+            "name": answer,
+            "value": false
+          }
+      );
+    }
+  }
+
+  void build_list_capacitate(Question question) {
+    for (String answer in question.answers) {
+      _capacitateAnswers.add(
+          {
+            "name": answer,
+            "value": false
+          }
+      );
+    }
+  }
+
+  void build_list_stele(Question question) {
+    for (String answer in question.answers) {
+      _steleAnswers.add(
+          {
+            "name": answer,
+            "value": false
+          }
+      );
+    }
+  }
+
+  void build_list_mic_dejun(Question question) {
+    for (String answer in question.answers) {
+      _micdejunAnswers.add(
+          {
+            "name": answer,
+            "value": false
+          }
+      );
+    }
+  }
+
+  void build_list_baie(Question question) {
+    for (String answer in question.answers) {
+      _baieAnswers.add(
+          {
+            "name": answer,
+            "value": false
+          }
+      );
+    }
+  }
+
+  void build_list_scor(Question question) {
+    for (String answer in question.answers) {
+      _scorAnswers.add(
+          {
+            "name": answer,
+            "value": false
+          }
+      );
+    }
+  }
+
+  void build_list_distanta_centru(Question question) {
+    for (String answer in question.answers) {
+      _distantaCentruAnswers.add(
+          {
+            "name": answer,
+            "value": false
+          }
+      );
+    }
+  }
 }

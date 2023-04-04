@@ -11,4 +11,10 @@ class Question {
     List<String> answers = answersJson != null ? List.from(answersJson) : List.empty();
     return Question(name: json['name'], questionText: json['questionText'], answers: answers);
   }
+
+  Map<String, dynamic> toJson() => {
+    'name': name,
+    'questionText': questionText,
+    'answers': answers
+  };
 }

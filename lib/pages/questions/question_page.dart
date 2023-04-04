@@ -61,16 +61,18 @@ class _QuestionPageState extends State<QuestionPage> {
                                     borderRadius: BorderRadius.circular(10.0)),
                               ),
                               onPressed: () => {
-                                if (_questionIndex == questionsProvider.questions.length - 1) {
-
-
+                                if (_questionIndex == questionsProvider.questions.length - 1 && _answer != '') {
                                   Navigator.of(context).push(MaterialPageRoute(
                                       builder: (_) => ChangeNotifierProvider.value(
                                         value: context.read<QuestionProvider>(),
-                                        child: HotelPage(answers: _questionAnswered),)),
+                                        child: HotelPage(answers: _questionAnswered, lastQuestion: questionsProvider.questions[questionsProvider.questions.length - 1], lastAnswer: _answer),)),
                                   )
                                 } else {
-                                  _answerQuestion(questionsProvider.questions[_questionIndex], _answer)
+                                  if (_answer == '') {
+
+                                  } else {
+                                    _answerQuestion(questionsProvider.questions[_questionIndex], _answer)
+                                  }
                                 },
                               },
                               child: _questionIndex == questionsProvider.questions.length - 1 ? const Text(
@@ -205,66 +207,35 @@ class _QuestionPageState extends State<QuestionPage> {
         children: List.generate(
           question.answers.length,
               (index) => Card(
-                color: Colors.amber,
-                child: SizedBox(
-                  height: 58,
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(10.0,1,0,0),
-                    child: CheckboxListTile(
-                      controlAffinity: ListTileControlAffinity.leading,
-                      contentPadding: EdgeInsets.zero,
-                      dense: true,
-                      title: Text(
-                        question.answers[index],
-                        style: const TextStyle(fontSize: 25.0,color: Colors.black),
-                      ),
-                      value: _roomFacilitiesAnswers[index]["value"],
-                      checkColor: Colors.black,
-                      onChanged: (value) {
-                        userAnswers.add(question.answers[index]);
-                        _questionAnswered.add(new Question(name: question.name, questionText: question.questionText, answers: userAnswers));
-                        setState(() {
-                          _roomFacilitiesAnswers[index]["value"] = value;
-                        });
-                      },
-                    ),
+            color: Colors.amber,
+            child: SizedBox(
+              height: 58,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(10.0,1,0,0),
+                child: CheckboxListTile(
+                  controlAffinity: ListTileControlAffinity.leading,
+                  contentPadding: EdgeInsets.zero,
+                  dense: true,
+                  title: Text(
+                    question.answers[index],
+                    style: const TextStyle(fontSize: 25.0,color: Colors.black),
                   ),
+                  value: _roomFacilitiesAnswers[index]["value"],
+                  checkColor: Colors.black,
+                  onChanged: (value) {
+                    userAnswers.add(question.answers[index]);
+                    setState(() {
+                      _roomFacilitiesAnswers[index]["value"] = value;
+                    });
+                  },
                 ),
               ),
+            ),
+          ),
         ),
       ),
     );
   }
-
-  // Widget answersText(Question question, List answersMap){
-  //   List<String> userAnswers = [];
-  //   String? character = question.answers[0];
-  //   return Column(
-  //     children: List.generate(
-  //       question.answers.length,
-  //           (index) => Card(
-  //         color: Colors.amber,
-  //         child: ListTile(
-  //           title: Text(
-  //             question.answers[index],
-  //             style: const TextStyle(fontSize: 30.0,color: Colors.black),
-  //           ),
-  //           leading: Card(
-  //             color: Colors.amber,
-  //             child: Radio<String>(
-  //               value: answersMap[index]["value"],
-  //               groupValue: character,
-  //               onChanged: (value) {
-  //                 setState(() {
-  //                   answersMap[index]["value"] = value;
-  //                 });
-  //               },
-  //             ),
-  //           ),
-  //         ),
-  //       ),),
-  //   );
-  // }
 
   void build_list_facilities(Question question) {
     for (String answer in question.answers) {
@@ -291,19 +262,21 @@ class _QuestionPageState extends State<QuestionPage> {
   void _answerQuestion(Question question, String answer) {
     setState(() {
       if (question.name == 'facilitati') {
+        List<String> answers = [];
         for (int i = 0; i < _facilitiesAnswers.length; i++){
           if (_facilitiesAnswers[i]["value"] == true) {
-            _questionAnswered.add(
-                addAnswers(question, _facilitiesAnswers[i]["name"]));
-          }
-      }
-      } else if (question.name == 'facilitati_camera') {
-        for (int i = 0; i < _roomFacilitiesAnswers.length; i++){
-          if (_roomFacilitiesAnswers[i]["value"] == true) {
-            _questionAnswered.add(
-                addAnswers(question, _roomFacilitiesAnswers[i]["name"]));
+            answers.add(_facilitiesAnswers[i]["name"]);
           }
         }
+        _questionAnswered.add(addAnswers(question, answers));
+      } else if (question.name == 'facilitati_camera') {
+        List<String> answers = [];
+        for (int i = 0; i < _roomFacilitiesAnswers.length; i++){
+          if (_roomFacilitiesAnswers[i]["value"] == true) {
+            answers.add(_roomFacilitiesAnswers[i]["name"]);
+          }
+        }
+        _questionAnswered.add(addAnswers(question, answers));
       } else {
         _questionAnswered.add(addAnswer(question, answer));
       }

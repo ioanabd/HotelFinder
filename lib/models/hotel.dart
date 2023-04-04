@@ -19,6 +19,6 @@ class Hotel {
     var roomFacilitiesJson = json['roomFacilities'];
     List<String> facilities = facilitiesJson != null ? List.from(facilitiesJson) : List.empty();
     List<String> roomFacilities = roomFacilitiesJson != null ? List.from(roomFacilitiesJson) : List.empty();
-    return Hotel(Name: json['name'], PropertyType:  json['propertyType'], Capacity: json['capacity'], Stars: json['starts'], Breakfast: json['breakfast'], Facilities: facilities, RoomFacilities: roomFacilities, PrivateBathroom: json['privateBathroom'], Rating: json['rating'], DistanceToCenter: json['distanceToCenter']);
+    return Hotel(Name: json['name'], PropertyType:  json['propertyType'], Capacity: json['capacity'], Stars: json['stars'], Breakfast: json['breakfast'], Facilities: facilities, RoomFacilities: roomFacilities, PrivateBathroom: json['privateBathroom'], Rating: json['rating'], DistanceToCenter: json['distanceToCenter']);
   }
 }

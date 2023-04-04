@@ -31,15 +31,16 @@ class QuestionService{
   Future<List<Hotel>> getHotels(List<Question> answers) async {
     try {
       final response = await http.post(
-        Uri.parse('$_baseUri/$_questionsResource'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: json.encode(answers)).timeout(_timeout);
+          Uri.parse('$_baseUri/$_questionsResource'),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: json.encode(answers)).timeout(_timeout);
 
-      if(response.statusCode == 201){
-        var x = response.body;
-        return [];
+      if(response.statusCode == 200){
+        var hotelsResponse = json.decode(response.body);
+        List<Hotel> hotels = List<Hotel>.from(hotelsResponse.map((hotel) => Hotel.fromJson(hotel)));
+        return hotels;
       } else {
         throw Exception('Failed to retrieve hotels!');
       }
@@ -47,6 +48,4 @@ class QuestionService{
       throw Exception('Unhandled exception');
     }
   }
-
-
 }

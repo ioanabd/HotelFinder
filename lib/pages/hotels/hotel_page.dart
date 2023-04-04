@@ -8,7 +8,9 @@ import '../../widgets/custom_appbar.dart';
 
 class HotelPage extends StatefulWidget {
   final List<Question> answers;
-  const HotelPage({Key? key, required this.answers}) : super(key: key);
+  final Question lastQuestion;
+  final String lastAnswer;
+  const HotelPage({Key? key, required this.answers, required this.lastQuestion, required this.lastAnswer}) : super(key: key);
 
   @override
   State<HotelPage> createState() => _HotelPageState();
@@ -19,40 +21,43 @@ class _HotelPageState extends State<HotelPage> {
   @override
   Widget build(BuildContext context) {
     var questionsProvider = context.watch<QuestionProvider>();
+
+    widget.answers.add(Question(name: widget.lastQuestion.name, questionText: widget.lastQuestion.questionText, answers: [widget.lastAnswer]));
+
     return FutureBuilder(
         future: questionsProvider.getHotelsFuture(widget.answers),
         builder: (BuildContext ctx, AsyncSnapshot asyncSnapshot) {
-      if (asyncSnapshot.connectionState == ConnectionState.done) {
-        if (asyncSnapshot.hasError) {
-          return const Center(child: Text('Could not retrieve hotels!'));
+          if (asyncSnapshot.connectionState == ConnectionState.done) {
+            if (asyncSnapshot.hasError) {
+              return const Center(child: Text('Could not retrieve hotels!'));
+            }
+            return SafeArea(
+                child: Scaffold(
+                  appBar: const CustomAppBar(title: 'Hotel Finder', back: false),
+                  backgroundColor: Colors.white,
+                  body: SingleChildScrollView(
+                    child: ListView.builder(
+                        shrinkWrap: true,
+                        physics: const ScrollPhysics(),
+                        itemCount: questionsProvider.hotels.length,
+                        itemBuilder: (BuildContext ctx, int index) {
+                          return Container(
+                            alignment: Alignment.center,
+                            child: Column(
+                              children:[
+                                hotelDescription(questionsProvider.hotels[index]),
+                              ],
+                            ),
+                          );
+                        }
+                    ),
+                  ),
+                )
+            );
+          }else {
+            return const Center(child: CircularProgressIndicator());
+          }
         }
-        return SafeArea(
-            child: Scaffold(
-              appBar: const CustomAppBar(title: 'Hotel Finder', back: false),
-              backgroundColor: Colors.white,
-              body: SingleChildScrollView(
-                child: ListView.builder(
-                    shrinkWrap: true,
-                    physics: const ScrollPhysics(),
-                    itemCount: questionsProvider.hotels.length,
-                    itemBuilder: (BuildContext ctx, int index) {
-                      return Container(
-                        alignment: Alignment.center,
-                        child: Column(
-                          children:[
-                            hotelDescription(questionsProvider.hotels[index]),
-                          ],
-                        ),
-                      );
-                    }
-                ),
-              ),
-            )
-        );
-      }else {
-        return const Center(child: CircularProgressIndicator());
-      }
-    }
     );
   }
 
@@ -87,7 +92,7 @@ class _HotelPageState extends State<HotelPage> {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                  Padding(
+                Padding(
                   padding: const EdgeInsets.fromLTRB(15,10,20,0),
                   child: Text(
                     hotel.Name,
@@ -165,7 +170,7 @@ class _HotelPageState extends State<HotelPage> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                        const Text(
+                      const Text(
                         'Mic dejun inclus:',
                         style: TextStyle(color: Colors.black,
                           fontSize: 25,decoration: TextDecoration.none,
@@ -173,7 +178,7 @@ class _HotelPageState extends State<HotelPage> {
                       ),
                       const SizedBox(width: 10.0),
                       breakfast ?
-                          const Icon(Icons.check_circle, size: 27, color: Colors.green,)
+                      const Icon(Icons.check_circle, size: 27, color: Colors.green,)
                           : const Icon(Icons.close_outlined, size: 27, color: Colors.pink)
                     ],
                   ),
@@ -184,14 +189,14 @@ class _HotelPageState extends State<HotelPage> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                        Expanded(
-                          child: Text(roomFacilities, style: const TextStyle(color: Colors.black,
-                            fontSize: 25,decoration: TextDecoration.none,
-                          ),
-                            maxLines: 5,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        )
+                      Expanded(
+                        child: Text(roomFacilities, style: const TextStyle(color: Colors.black,
+                          fontSize: 25,decoration: TextDecoration.none,
+                        ),
+                          maxLines: 5,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      )
                     ],
                   ),
                 ),
@@ -212,10 +217,10 @@ class _HotelPageState extends State<HotelPage> {
                     ],
                   ),
                 )
-            ]
+              ]
+          ),
         ),
       ),
-    ),
     );
   }
 }

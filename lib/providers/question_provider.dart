@@ -16,7 +16,7 @@ class QuestionProvider extends ChangeNotifier{
 
   Future _getQuestionsFuture() async {
     // questions = await _questionService.getQuestions();
-    questions = [new Question(name: 'facilitati_camera', questionText: 'Cati ani ai?', answers: ['Cati ani ai?1', 'Cati ani ai?2', 'Cati ani ai?3']), new Question(name: 'asdf', questionText: 'Cati ani ai?', answers: ['1', '2', '3'])];
+    questions = [new Question(name: 'facilitati', questionText: 'Cati ani ai?', answers: ['Cati ani ai?1', 'Cati ani ai?2', 'Cati ani ai?3']), new Question(name: 'facilitati_camera', questionText: 'Cati ani ai?', answers: ['asdfg1', 'cvbn2', 'sdfgh3'])];
   }
 
   Future getHotelsFuture(List<Question> answers) async {

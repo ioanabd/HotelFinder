@@ -19,15 +19,11 @@ class _QuestionPageState extends State<QuestionPage> {
 
   List<Question> _questionAnswered = [];
 
+  var _questionIndex = 0;
+
   List _facilitiesAnswers = [];
   List _roomFacilitiesAnswers = [];
-  List _tipProprietateAnswers = [];
-  List _capacitateAnswers = [];
-  List _distantaCentruAnswers = [];
-  List _scorAnswers = [];
-  List _baieAnswers = [];
-  List _micdejunAnswers = [];
-  List _steleAnswers = [];
+  String _answer = '';
 
   @override
   Widget build(BuildContext context) {
@@ -46,75 +42,50 @@ class _QuestionPageState extends State<QuestionPage> {
                 body: SingleChildScrollView(
                   child: Column(
                     children: [
-                      ListView.builder(
-                          shrinkWrap: true,
-                          physics: const ScrollPhysics(),
-                          itemCount: questionsProvider.questions.length,
-                          itemBuilder: (BuildContext ctx, int index) {
-                            if (questionsProvider.questions[index].name == "facilitati") {
-                              build_list_facilities(questionsProvider.questions[index]);
-                              return Container(
-                                alignment: Alignment.center,
-                                child: Column(
-                                  children: [
-                                    quizQuestion(questionsProvider.questions[index].questionText),
-                                    quizFaciltiesMultipleAnswersQuestion(questionsProvider.questions[index])
-                                  ],
-                                ),
-                              );
-                            } else if (questionsProvider.questions[index].name == "facilitati_camera") {
-                              build_list_room_facilities(questionsProvider.questions[index]);
-                              return Container(
-                                alignment: Alignment.center,
-                                child: Column(
-                                  children: [
-                                    quizQuestion(questionsProvider.questions[index].questionText),
-                                    quizRoomFaciltiesMultipleAnswersQuestion(questionsProvider.questions[index])
-                                  ],
-                                ),
-                              );
-                            } else {
-                              build_list_baie(questionsProvider.questions[index]);
-                              return Container(
-                                alignment: Alignment.center,
-                                child: Column(
-                                  children: [
-                                    quizQuestion(questionsProvider.questions[index]
-                                        .questionText),
-                                    answersText(questionsProvider.questions[index], _baieAnswers
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }
-                          }
-                      ),
+
+                      quizQuestion(questionsProvider.questions[_questionIndex].questionText),
+
+                      generateAnswers(questionsProvider.questions[_questionIndex]),
+
                       Padding(
                         padding: const EdgeInsets.fromLTRB(5,8.0,6,8.0),
                         child: SizedBox(
                           width: 378,
                           height: 64,
                           child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.amber[800],
-                              foregroundColor: Colors.black,
-                              elevation: 3,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10.0)),
-                            ),
-                            onPressed: () => {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (_) => ChangeNotifierProvider.value(
-                                    value: context.read<QuestionProvider>(),
-                                    child: HotelPage(answers: _questionAnswered),)),
-                              ),},
-                            child: const Text(
-                              'Get Hotels',
-                              style: TextStyle(
-                                  fontSize: 27,
-                                  decoration: TextDecoration.none
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.amber[800],
+                                foregroundColor: Colors.black,
+                                elevation: 3,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0)),
                               ),
-                            ),
+                              onPressed: () => {
+                                if (_questionIndex == questionsProvider.questions.length - 1) {
+
+
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (_) => ChangeNotifierProvider.value(
+                                        value: context.read<QuestionProvider>(),
+                                        child: HotelPage(answers: _questionAnswered),)),
+                                  )
+                                } else {
+                                  _answerQuestion(questionsProvider.questions[_questionIndex], _answer)
+                                },
+                              },
+                              child: _questionIndex == questionsProvider.questions.length - 1 ? const Text(
+                                'Get Hotels',
+                                style: TextStyle(
+                                    fontSize: 27,
+                                    decoration: TextDecoration.none
+                                ),
+                              ) : const Text(
+                                'Next question',
+                                style: TextStyle(
+                                    fontSize: 27,
+                                    decoration: TextDecoration.none
+                                ),
+                              )
                           ),
                         ),
                       ),
@@ -147,6 +118,47 @@ class _QuestionPageState extends State<QuestionPage> {
     );
   }
 
+  Widget generateAnswers(Question question) {
+    if (question.name == 'facilitati') {
+      if (_facilitiesAnswers.isEmpty) {
+        build_list_facilities(question);
+      }
+      return quizFaciltiesMultipleAnswersQuestion(question);
+    } else if (question.name == 'facilitati_camera') {
+      if (_roomFacilitiesAnswers.isEmpty) {
+        build_list_room_facilities(question);
+      }
+      return quizRoomFaciltiesMultipleAnswersQuestion(question);
+    } else {
+      return quizNormal(question);
+    }
+  }
+
+  Widget quizNormal(Question question) {
+    return Column(
+      children: question.answers.map((answer) => Padding(
+        padding: EdgeInsets.fromLTRB(6, 0, 6, 0),
+        child: Card(
+          color: Colors.amber,
+          child: RadioListTile(
+              title: Text(answer, style: const TextStyle(
+                fontSize: 25.0,
+                color: Colors.black,
+              ),),
+              value: answer,
+              groupValue: _answer,
+              onChanged: ((value) {
+                setState(() {
+                  _answer = value!;
+                });
+              })
+          ),
+        ),
+      ),
+      ).toList(),
+    );
+  }
+
   Widget quizFaciltiesMultipleAnswersQuestion(Question question) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(6.0,0,6,0),
@@ -154,26 +166,32 @@ class _QuestionPageState extends State<QuestionPage> {
         children: List.generate(
           question.answers.length,
               (index) => Card(
-                color: Colors.amber,
+            color: Colors.amber,
+            child: SizedBox(
+              height: 58,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(10.0,1,0,0),
                 child: CheckboxListTile(
-            controlAffinity: ListTileControlAffinity.leading,
-            contentPadding: EdgeInsets.zero,
-            dense: true,
-            title: Text(
-                question.answers[index],
-                style: const TextStyle(
-                  fontSize: 25.0,
-                  color: Colors.black,
+                  controlAffinity: ListTileControlAffinity.leading,
+                  contentPadding: EdgeInsets.zero,
+                  dense: true,
+                  title: Text(
+                    question.answers[index],
+                    style: const TextStyle(
+                      fontSize: 25.0,
+                      color: Colors.black,
+                    ),
+                  ),
+                  value: _facilitiesAnswers[index]["value"],
+                  onChanged: (value) {
+                    setState(() {
+                      _facilitiesAnswers[index]["value"] = value;
+                    });
+                  },
                 ),
-            ),
-            value: _facilitiesAnswers[index]["value"],
-            onChanged: (value) {
-                setState(() {
-                  _facilitiesAnswers[index]["value"] = value;
-                });
-            },
-          ),
               ),
+            ),
+          ),
         ),
       ),
     );
@@ -188,56 +206,65 @@ class _QuestionPageState extends State<QuestionPage> {
           question.answers.length,
               (index) => Card(
                 color: Colors.amber,
-                child: CheckboxListTile(
-            controlAffinity: ListTileControlAffinity.leading,
-            contentPadding: EdgeInsets.zero,
-            dense: true,
-            title: Text(
-                question.answers[index],
-                style: const TextStyle(fontSize: 25.0,color: Colors.black),
-            ),
-            value: _roomFacilitiesAnswers[index]["value"],
-            checkColor: Colors.black,
-            onChanged: (value) {
-                userAnswers.add(question.answers[index]);
-                _questionAnswered.add(new Question(name: question.name, questionText: question.questionText, answers: userAnswers));
-                setState(() {
-                  _roomFacilitiesAnswers[index]["value"] = value;
-                });
-            },
-          ),
+                child: SizedBox(
+                  height: 58,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(10.0,1,0,0),
+                    child: CheckboxListTile(
+                      controlAffinity: ListTileControlAffinity.leading,
+                      contentPadding: EdgeInsets.zero,
+                      dense: true,
+                      title: Text(
+                        question.answers[index],
+                        style: const TextStyle(fontSize: 25.0,color: Colors.black),
+                      ),
+                      value: _roomFacilitiesAnswers[index]["value"],
+                      checkColor: Colors.black,
+                      onChanged: (value) {
+                        userAnswers.add(question.answers[index]);
+                        _questionAnswered.add(new Question(name: question.name, questionText: question.questionText, answers: userAnswers));
+                        setState(() {
+                          _roomFacilitiesAnswers[index]["value"] = value;
+                        });
+                      },
+                    ),
+                  ),
+                ),
               ),
         ),
       ),
     );
   }
 
-  Widget answersText(Question question, List answersMap){
-    List<String> userAnswers = [];
-    String? character = question.answers[0];
-    return Column(
-      children: List.generate(
-          question.answers.length,
-              (index) => Card(
-              color: Colors.amber,
-                child: ListTile(
-                  title: Text(
-                    question.answers[index],
-                    style: const TextStyle(fontSize: 25.0,color: Colors.black),
-                  ),
-                  leading: Radio<String>(
-                    value: answersMap[index]["value"],
-                    groupValue: character,
-                    onChanged: (value) {
-                      setState(() {
-                        answersMap[index]["value"] = value;
-                      });
-                    },
-                  ),
-                ),
-      ),),
-    );
-  }
+  // Widget answersText(Question question, List answersMap){
+  //   List<String> userAnswers = [];
+  //   String? character = question.answers[0];
+  //   return Column(
+  //     children: List.generate(
+  //       question.answers.length,
+  //           (index) => Card(
+  //         color: Colors.amber,
+  //         child: ListTile(
+  //           title: Text(
+  //             question.answers[index],
+  //             style: const TextStyle(fontSize: 30.0,color: Colors.black),
+  //           ),
+  //           leading: Card(
+  //             color: Colors.amber,
+  //             child: Radio<String>(
+  //               value: answersMap[index]["value"],
+  //               groupValue: character,
+  //               onChanged: (value) {
+  //                 setState(() {
+  //                   answersMap[index]["value"] = value;
+  //                 });
+  //               },
+  //             ),
+  //           ),
+  //         ),
+  //       ),),
+  //   );
+  // }
 
   void build_list_facilities(Question question) {
     for (String answer in question.answers) {
@@ -261,80 +288,32 @@ class _QuestionPageState extends State<QuestionPage> {
     }
   }
 
-  void build_list_tip_proprietate(Question question) {
-    for (String answer in question.answers) {
-      _tipProprietateAnswers.add(
-          {
-            "name": answer,
-            "value": false
+  void _answerQuestion(Question question, String answer) {
+    setState(() {
+      if (question.name == 'facilitati') {
+        for (int i = 0; i < _facilitiesAnswers.length; i++){
+          if (_facilitiesAnswers[i]["value"] == true) {
+            _questionAnswered.add(
+                addAnswers(question, _facilitiesAnswers[i]["name"]));
           }
-      );
-    }
+      }
+      } else if (question.name == 'facilitati_camera') {
+        for (int i = 0; i < _roomFacilitiesAnswers.length; i++){
+          if (_roomFacilitiesAnswers[i]["value"] == true) {
+            _questionAnswered.add(
+                addAnswers(question, _roomFacilitiesAnswers[i]["name"]));
+          }
+        }
+      } else {
+        _questionAnswered.add(addAnswer(question, answer));
+      }
+      _questionIndex = _questionIndex + 1;
+    });
   }
-
-  void build_list_capacitate(Question question) {
-    for (String answer in question.answers) {
-      _capacitateAnswers.add(
-          {
-            "name": answer,
-            "value": false
-          }
-      );
-    }
+  Question addAnswers(Question question, List<String> answers) {
+    return new Question(name: question.name, questionText: question.questionText, answers: answers);
   }
-
-  void build_list_stele(Question question) {
-    for (String answer in question.answers) {
-      _steleAnswers.add(
-          {
-            "name": answer,
-            "value": false
-          }
-      );
-    }
-  }
-
-  void build_list_mic_dejun(Question question) {
-    for (String answer in question.answers) {
-      _micdejunAnswers.add(
-          {
-            "name": answer,
-            "value": false
-          }
-      );
-    }
-  }
-
-  void build_list_baie(Question question) {
-    for (String answer in question.answers) {
-      _baieAnswers.add(
-          {
-            "name": answer,
-            "value": false
-          }
-      );
-    }
-  }
-
-  void build_list_scor(Question question) {
-    for (String answer in question.answers) {
-      _scorAnswers.add(
-          {
-            "name": answer,
-            "value": false
-          }
-      );
-    }
-  }
-
-  void build_list_distanta_centru(Question question) {
-    for (String answer in question.answers) {
-      _distantaCentruAnswers.add(
-          {
-            "name": answer,
-            "value": false
-          }
-      );
-    }
+  Question addAnswer(Question question, String answer) {
+    return new Question(name: question.name, questionText: question.questionText, answers: [answer]);
   }
 }

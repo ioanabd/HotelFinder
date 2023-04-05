@@ -35,8 +35,10 @@ class _HotelPageState extends State<HotelPage> {
                 child: Scaffold(
                   appBar: const CustomAppBar(title: 'Gaseste-ti cazare', back: false),
                   backgroundColor: Colors.white,
-                  body: SingleChildScrollView(
-                    child: ListView.builder(
+                  body:
+                  questionsProvider.hotels.isNotEmpty ? SingleChildScrollView(
+                    child:
+                    ListView.builder(
                         shrinkWrap: true,
                         physics: const ScrollPhysics(),
                         itemCount: questionsProvider.hotels.length,
@@ -50,8 +52,17 @@ class _HotelPageState extends State<HotelPage> {
                             ),
                           );
                         }
+                    )
+                  ) :
+                  const Center(
+                    child: Text('Nu am putut gasi o cazare conform cerintelor!',
+                      style: TextStyle(
+                          fontSize: 27.5,
+                          color: Colors.black
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                  ),
+                  )
                 )
             );
           }else {

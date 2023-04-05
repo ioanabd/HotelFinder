@@ -33,7 +33,7 @@ class _HotelPageState extends State<HotelPage> {
             }
             return SafeArea(
                 child: Scaffold(
-                  appBar: const CustomAppBar(title: 'Hotel Finder', back: false),
+                  appBar: const CustomAppBar(title: 'Gaseste-ti cazare', back: false),
                   backgroundColor: Colors.white,
                   body: SingleChildScrollView(
                     child: ListView.builder(
@@ -87,7 +87,7 @@ class _HotelPageState extends State<HotelPage> {
         ),
         child: SizedBox(
           width: 370,
-          height: 400,
+          height: 440,
           child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,

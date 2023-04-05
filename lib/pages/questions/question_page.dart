@@ -24,6 +24,7 @@ class _QuestionPageState extends State<QuestionPage> {
   List _facilitiesAnswers = [];
   List _roomFacilitiesAnswers = [];
   String _answer = '';
+  String error = '';
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +38,7 @@ class _QuestionPageState extends State<QuestionPage> {
             }
             return SafeArea(
               child: Scaffold(
-                appBar: const CustomAppBar(title: 'Hotel Finder', back: true),
+                appBar: const CustomAppBar(title: 'Gaseste-ti cazare', back: true),
                 backgroundColor: Colors.white,
                 body: SingleChildScrollView(
                   child: Column(
@@ -60,37 +61,53 @@ class _QuestionPageState extends State<QuestionPage> {
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10.0)),
                               ),
-                              onPressed: () => {
+                              onPressed: () {
+                                setState(() {
+                                 error = '';
+                                });
                                 if (_questionIndex == questionsProvider.questions.length - 1 && _answer != '') {
                                   Navigator.of(context).push(MaterialPageRoute(
                                       builder: (_) => ChangeNotifierProvider.value(
                                         value: context.read<QuestionProvider>(),
                                         child: HotelPage(answers: _questionAnswered, lastQuestion: questionsProvider.questions[questionsProvider.questions.length - 1], lastAnswer: _answer),)),
-                                  )
+                                  );
                                 } else {
-                                  if (_answer == '') {
-
+                                  if (_answer == '' && questionsProvider.questions[_questionIndex].name!='facilitati' && questionsProvider.questions[_questionIndex].name!='facilitati_camera') {
+                                        error = 'Va rugam raspundeti!';
                                   } else {
-                                    _answerQuestion(questionsProvider.questions[_questionIndex], _answer)
+                                    _answerQuestion(questionsProvider.questions[_questionIndex], _answer);
+                                    _answer = '';
+                                    error = '';
                                   }
-                                },
+                                }
                               },
                               child: _questionIndex == questionsProvider.questions.length - 1 ? const Text(
-                                'Get Hotels',
+                                'Vezi cazari',
                                 style: TextStyle(
                                     fontSize: 27,
                                     decoration: TextDecoration.none
                                 ),
                               ) : const Text(
-                                'Next question',
+                                'Intrebarea urmatoare',
                                 style: TextStyle(
-                                    fontSize: 27,
+                                    fontSize: 27.5,
                                     decoration: TextDecoration.none
                                 ),
                               )
                           ),
+
                         ),
                       ),
+                    Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(error,
+                          style: const TextStyle(
+                              fontSize: 27.5,
+                              color: Colors.red
+                          ),
+                          textAlign: TextAlign.center,
+                        )
+                    )
                     ],
                   ),
                 ),
@@ -123,12 +140,12 @@ class _QuestionPageState extends State<QuestionPage> {
   Widget generateAnswers(Question question) {
     if (question.name == 'facilitati') {
       if (_facilitiesAnswers.isEmpty) {
-        build_list_facilities(question);
+        buildListFacilities(question);
       }
       return quizFaciltiesMultipleAnswersQuestion(question);
     } else if (question.name == 'facilitati_camera') {
       if (_roomFacilitiesAnswers.isEmpty) {
-        build_list_room_facilities(question);
+        buildListRoomFacilities(question);
       }
       return quizRoomFaciltiesMultipleAnswersQuestion(question);
     } else {
@@ -139,7 +156,7 @@ class _QuestionPageState extends State<QuestionPage> {
   Widget quizNormal(Question question) {
     return Column(
       children: question.answers.map((answer) => Padding(
-        padding: EdgeInsets.fromLTRB(6, 0, 6, 0),
+        padding: const EdgeInsets.fromLTRB(6, 0, 6, 0),
         child: Card(
           color: Colors.amber,
           child: RadioListTile(
@@ -237,7 +254,7 @@ class _QuestionPageState extends State<QuestionPage> {
     );
   }
 
-  void build_list_facilities(Question question) {
+  void buildListFacilities(Question question) {
     for (String answer in question.answers) {
       _facilitiesAnswers.add(
           {
@@ -248,7 +265,7 @@ class _QuestionPageState extends State<QuestionPage> {
     }
   }
 
-  void build_list_room_facilities(Question question) {
+  void buildListRoomFacilities(Question question) {
     for (String answer in question.answers) {
       _roomFacilitiesAnswers.add(
           {
@@ -284,9 +301,9 @@ class _QuestionPageState extends State<QuestionPage> {
     });
   }
   Question addAnswers(Question question, List<String> answers) {
-    return new Question(name: question.name, questionText: question.questionText, answers: answers);
+    return Question(name: question.name, questionText: question.questionText, answers: answers);
   }
   Question addAnswer(Question question, String answer) {
-    return new Question(name: question.name, questionText: question.questionText, answers: [answer]);
+    return Question(name: question.name, questionText: question.questionText, answers: [answer]);
   }
 }

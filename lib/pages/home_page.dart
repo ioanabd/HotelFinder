@@ -14,16 +14,15 @@ class _HomePageState extends State<HomePage> {
   Color? fundal = Colors.amber;
   @override
   Widget build(BuildContext context) {
-    var questionsProvider = context.watch<QuestionProvider>();
 
     return SafeArea(child:
     Container(
         constraints: const BoxConstraints.expand(),
         decoration: BoxDecoration(
             image: DecorationImage(
-              image: AssetImage('assets/images/wallpaper_home.png'),
+              image: const AssetImage('assets/images/wallpaper_home.png'),
               fit: BoxFit.cover,
-              colorFilter: new ColorFilter.mode(Colors.black.withOpacity(0.6), BlendMode.dstATop),
+              colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.6), BlendMode.dstATop),
             )
         ),
         child: Padding(
@@ -37,9 +36,9 @@ class _HomePageState extends State<HomePage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(0,0,170,0),
+                    padding: const EdgeInsets.fromLTRB(0,0,110,0),
                     child: Text(
-                      'Welcome!',
+                      'Bine ai venit!',
                       style: TextStyle(
                         color: Colors.amber[800],
                         fontSize: 39,
@@ -51,7 +50,7 @@ class _HomePageState extends State<HomePage> {
                   Padding(
                     padding: const EdgeInsets.fromLTRB(25,10,10,20),
                     child: Text(
-                      'Find the perfect accommodation for you by answering some simple questions.',
+                      'Gaseste cazarea perfecta pentru nevoile tale raspunzand la cateva intrebari',
                       style: TextStyle(
                           color: Colors.amber[600],
                           fontSize: 24,
@@ -78,7 +77,7 @@ class _HomePageState extends State<HomePage> {
                             )
                         ))
                       },
-                      child: const Text('Get started',style: TextStyle(fontSize: 27, decoration: TextDecoration.none),
+                      child: const Text('Start',style: TextStyle(fontSize: 29, decoration: TextDecoration.none),
                       ),
                     ),
                   ),
